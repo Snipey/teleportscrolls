@@ -1,0 +1,11 @@
+name: TeleportScrolls
+version: 1.0.0
+author: Snipey
+website: snipey.dev
+main: dev.snipey.teleportscrolls.TeleportScrolls
+api-version: 1.15
+
+commands:
+  scroll:
+    description: Give yourself a scroll
+    usage: /scroll
