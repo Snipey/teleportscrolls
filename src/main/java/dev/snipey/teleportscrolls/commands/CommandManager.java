@@ -1,6 +1,7 @@
 package dev.snipey.teleportscrolls.commands;
 
 import dev.snipey.teleportscrolls.commands.subcommands.CreateScroll;
+import dev.snipey.teleportscrolls.commands.subcommands.TestTrade;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -15,6 +16,7 @@ public class CommandManager implements CommandExecutor {
 
   public CommandManager(){
     subcommands.add(new CreateScroll());
+    subcommands.add(new TestTrade());
   }
 
   @Override

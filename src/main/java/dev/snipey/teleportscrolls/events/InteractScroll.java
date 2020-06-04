@@ -22,9 +22,10 @@ public class InteractScroll implements Listener {
     Action a = e.getAction();
     EquipmentSlot slot = e.getHand();
     ItemStack hand = e.getPlayer().getInventory().getItemInMainHand();
+    Merchant merch = ScrollManager.createScrollForge();
     if (a == Action.RIGHT_CLICK_BLOCK && hand.getType() == Material.PAPER) {
       if (slot.name() != "OFF_HAND" && block.getType() == Material.EMERALD_BLOCK) {
-        p.openInventory(ScrollManager.createScrollForge());
+        p.openMerchant(merch, false);
       }
     }
   }
@@ -37,28 +38,6 @@ public class InteractScroll implements Listener {
     HumanEntity ent = e.getWhoClicked();
     Player player = (Player) ent;
     int rawSlot = e.getRawSlot();
-    if(rawSlot <= 27){
-      if(ScrollManager.checkIfStatusRing(rawSlot)){
-        e.setCancelled(true);
-      } else {
-        if(ScrollManager.checkIfCrafting(rawSlot)){
-          player.sendMessage("" + a);
-          switch (rawSlot){
-            case 10:
-              ScrollManager.changeBorder(inv, a, "slot1");
-              break;
-            case 13:
-              ScrollManager.changeBorder(inv, a, "slot2");
-              break;
-          }
-          // Update crafting slot to color
-        } else {
-          // Change wool if ready to craft scroll
-          // Craft item and give to player if open inventory slot
-          // Drop on ground if inventory full
-          e.setCancelled(true);
-        }
-      }
-    }
+
   }
 }
