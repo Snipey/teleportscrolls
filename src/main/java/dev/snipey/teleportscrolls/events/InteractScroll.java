@@ -2,6 +2,7 @@ package dev.snipey.teleportscrolls.events;
 
 import dev.snipey.teleportscrolls.TeleportScrolls;
 import dev.snipey.teleportscrolls.managers.ScrollManager;
+import net.md_5.bungee.api.ChatMessageType;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
@@ -76,7 +77,7 @@ public class InteractScroll implements Listener {
               }
             }
           }.runTaskLater(plugin, 100L));
-          p.sendMessage("Teleporting in 5 seconds");
+          p.sendMessage(ChatColor.GREEN + "Teleporting in 5 seconds");
 
         } else {
           p.sendMessage("No data detected");
