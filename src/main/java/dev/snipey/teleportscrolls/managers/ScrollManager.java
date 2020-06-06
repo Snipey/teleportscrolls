@@ -1,51 +1,59 @@
 package dev.snipey.teleportscrolls.managers;
 
+import dev.snipey.teleportscrolls.TeleportScrolls;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Item;
-import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 
 public class ScrollManager {
+  private static final TeleportScrolls plugin = JavaPlugin.getPlugin(TeleportScrolls.class);
 
   public static Inventory createScrollForgeMenu() {
     Inventory inv = Bukkit.createInventory(null, 9, "Waystone Menu");
     ItemStack craft = new ItemStack(Material.ANVIL);
-    inv.setItem(0, null);
-    inv.setItem(0, null);
-    inv.setItem(0, null);
+    ItemMeta meta = craft.getItemMeta();
+    meta.setDisplayName(ChatColor.GREEN + "Craft Blueprint");
+
+    ItemStack wool = new ItemStack(Material.ANVIL);
+    ItemMeta woolmeta = wool.getItemMeta();
+    woolmeta.setDisplayName(ChatColor.GREEN + "Craft Blueprint");
+
+    craft.setItemMeta(meta);
     inv.setItem(0, craft); // Craft Blueprint
-    inv.setItem(0, null); // Delete Waystone
-    inv.setItem(0, null);
-    inv.setItem(0, null); // Waystone Info
-    inv.setItem(0, null);
+    inv.setItem(4, new ItemStack(Material.RED_WOOL)); // Delete Waystone
+    inv.setItem(8, new ItemStack(Material.PAPER)); // Waystone Info
     return inv;
   }
 
-  public static Merchant createScrollForge() {
+  public static Merchant createScrollForge(Location loc) {
     // create the actual merchant
     Merchant merchant = Bukkit.createMerchant(ChatColor.LIGHT_PURPLE + "Scroll Forge");
     // Create a list of recipes for this merchant
     List<MerchantRecipe> recipes = new ArrayList<>();
-    recipes.add(BlueprintScroll());
+    recipes.add(BlueprintScroll(loc));
     // TODO Check what upgrade level the waystone is
-    recipes.add(TierOne());
-    recipes.add(TierTwo());
-    recipes.add(TierThree());
+    recipes.add(TierOne(loc));
+    recipes.add(TierTwo(loc));
+    recipes.add(TierThree(loc));
     // Add this list of recipes to our merchant
     merchant.setRecipes(recipes);
     // Open this merchant inventory to the player
     return merchant;
   }
 
-  private static MerchantRecipe TierOne() {
-    ItemStack scroll = createScroll(500);
+  private static MerchantRecipe TierOne(Location loc) {
+    ItemStack scroll = createScroll(500, loc);
 
-    ItemStack blueprint = BlueprintScrollItem();
+    ItemStack blueprint = BlueprintScrollItem(null);
 
     MerchantRecipe recipe = new MerchantRecipe(scroll, 10);
     recipe.addIngredient(blueprint);
@@ -53,10 +61,10 @@ public class ScrollManager {
     return recipe;
   }
 
-  private static MerchantRecipe TierTwo() {
-    ItemStack scroll = createScroll(1000);
+  private static MerchantRecipe TierTwo(Location loc) {
+    ItemStack scroll = createScroll(1000, loc);
 
-    ItemStack blueprint = BlueprintScrollItem();
+    ItemStack blueprint = BlueprintScrollItem(null);
 
     MerchantRecipe recipe = new MerchantRecipe(scroll, 10);
     recipe.addIngredient(blueprint);
@@ -64,10 +72,10 @@ public class ScrollManager {
     return recipe;
   }
 
-  private static MerchantRecipe TierThree() {
-    ItemStack scroll = createScroll(1500);
+  private static MerchantRecipe TierThree(Location loc) {
+    ItemStack scroll = createScroll(1500, loc);
 
-    ItemStack blueprint = BlueprintScrollItem();
+    ItemStack blueprint = BlueprintScrollItem(null);
 
     MerchantRecipe recipe = new MerchantRecipe(scroll, 10);
     recipe.addIngredient(blueprint);
@@ -75,8 +83,8 @@ public class ScrollManager {
     return recipe;
   }
 
-  private static MerchantRecipe BlueprintScroll() {
-    ItemStack blueprint = BlueprintScrollItem();
+  private static MerchantRecipe BlueprintScroll(Location loc) {
+    ItemStack blueprint = BlueprintScrollItem(loc);
 
     MerchantRecipe recipe = new MerchantRecipe(blueprint, 10);
     recipe.addIngredient(new ItemStack(Material.PAPER));
@@ -84,22 +92,38 @@ public class ScrollManager {
     return recipe;
   }
 
-  private static ItemStack BlueprintScrollItem(){
+  private static ItemStack BlueprintScrollItem(Location loc) {
     ItemStack blueprint = new ItemStack(Material.PAPER);
-    ItemMeta bluemeta = blueprint.getItemMeta();
-    bluemeta.setDisplayName(ChatColor.LIGHT_PURPLE + "Scroll Blueprint");
-    blueprint.setItemMeta(bluemeta);
+
+    ItemMeta meta = blueprint.getItemMeta();
+    meta.setDisplayName(ChatColor.LIGHT_PURPLE + "Scroll Blueprint");
+    if (loc != null) {
+      ArrayList<String> lore = new ArrayList<String>();
+      meta.setLore(lore);
+    }
+    blueprint.setItemMeta(meta);
     return blueprint;
   }
 
-  public static ItemStack createScroll(int charges) {
+  public static ItemStack createScroll(int charges, Location loc) {
     ItemStack scroll = new ItemStack(Material.PAPER);
     ItemMeta meta = scroll.getItemMeta();
+
+    PersistentDataContainer data = meta.getPersistentDataContainer();
+    if(!data.has(plugin.xKey, PersistentDataType.INTEGER)){
+      data.set(plugin.xKey, PersistentDataType.INTEGER, loc.getBlockX());
+      data.set(plugin.yKey, PersistentDataType.INTEGER, loc.getBlockY());
+      data.set(plugin.zKey, PersistentDataType.INTEGER, loc.getBlockZ());
+    }
+
     ArrayList<String> lore = new ArrayList<String>();
     meta.setDisplayName(ChatColor.DARK_PURPLE + "Scroll of Teleportation");
+    lore.add(ChatColor.GRAY + "Waystone Name");
+    lore.add("");
     lore.add(ChatColor.YELLOW + "Charges" + ChatColor.YELLOW + "" + ": " + ChatColor.LIGHT_PURPLE + charges);
     meta.setLore(lore);
     scroll.setItemMeta(meta);
     return scroll;
   }
+
 }
