@@ -6,6 +6,7 @@
 
     <groupId>groupId</groupId>
     <artifactId>TeleportScrolls</artifactId>
+    <version></version>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
