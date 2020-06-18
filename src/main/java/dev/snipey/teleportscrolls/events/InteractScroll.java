@@ -51,6 +51,8 @@ public class InteractScroll implements Listener {
       isQuarryStructure = Structure.WAYSTONE.test(block);
     }
     if (a == Action.RIGHT_CLICK_BLOCK && hand.getType() == Material.PAPER && isQuarryStructure) {
+      // TODO Check if waystone exists
+      // TODO Check if clicked with wand
       if (slot.name().equals("OFF_HAND")) return;
       switch (block.getType()) {
         case EMERALD_BLOCK:

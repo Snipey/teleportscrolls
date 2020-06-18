@@ -1,13 +1,14 @@
 package dev.snipey.teleportscrolls;
 
 import dev.snipey.teleportscrolls.commands.CommandManager;
+import dev.snipey.teleportscrolls.database.Database;
+import dev.snipey.teleportscrolls.database.SQLite;
 import dev.snipey.teleportscrolls.events.InteractScroll;
 import dev.snipey.teleportscrolls.util.ConfigManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
@@ -21,19 +22,26 @@ public final class TeleportScrolls extends JavaPlugin implements Listener {
   public final NamespacedKey xKey = new NamespacedKey(this, "x");
   public final NamespacedKey yKey = new NamespacedKey(this, "y");
   public final NamespacedKey zKey = new NamespacedKey(this, "z");
+
+  private Database db;
   @Override
   public void onEnable() {
+    this.db = new SQLite(this);
+    this.db.load();
     getServer().getPluginManager().registerEvents(new InteractScroll(), this);
     getCommand("scroll").setExecutor(new CommandManager());
     ConfigManager fileManager = new ConfigManager(this);
     fileManager.getConfig("config.yml").copyDefaults(true).save();
-    fileManager.getConfig("waystones.yml").copyDefaults(true).save();
     registerRecepies();
   }
 
   @Override
   public void onDisable() {
 
+  }
+
+  public Database getRDatabase() {
+    return this.db;
   }
 
   private void registerRecepies() {
