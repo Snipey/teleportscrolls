@@ -4,6 +4,7 @@ import dev.snipey.teleportscrolls.commands.CommandManager;
 import dev.snipey.teleportscrolls.database.Database;
 import dev.snipey.teleportscrolls.database.SQLite;
 import dev.snipey.teleportscrolls.events.InteractScroll;
+import dev.snipey.teleportscrolls.managers.SignMenuFactory;
 import dev.snipey.teleportscrolls.util.ConfigManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -23,9 +24,12 @@ public final class TeleportScrolls extends JavaPlugin implements Listener {
   public final NamespacedKey yKey = new NamespacedKey(this, "y");
   public final NamespacedKey zKey = new NamespacedKey(this, "z");
 
+  private SignMenuFactory signMenuFactory;
+
   private Database db;
   @Override
   public void onEnable() {
+    this.signMenuFactory = new SignMenuFactory(this);
     this.db = new SQLite(this);
     this.db.load();
     getServer().getPluginManager().registerEvents(new InteractScroll(), this);
@@ -40,7 +44,7 @@ public final class TeleportScrolls extends JavaPlugin implements Listener {
 
   }
 
-  public Database getRDatabase() {
+  public Database getDatabase() {
     return this.db;
   }
 
@@ -67,5 +71,9 @@ public final class TeleportScrolls extends JavaPlugin implements Listener {
     recipe.setIngredient('S', Material.STICK);
     // Finally, add the recipe to the bukkit recipes
     Bukkit.addRecipe(recipe);
+  }
+
+  public SignMenuFactory getSignMenuFactory() {
+    return this.signMenuFactory;
   }
 }

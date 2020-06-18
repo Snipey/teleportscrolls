@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
-import dev.snipey.teleportscrolls.database.Database; // import the database class.
 import dev.snipey.teleportscrolls.TeleportScrolls; // import your main class
 
 
@@ -20,8 +19,9 @@ public class SQLite extends Database {
   }
 
   public String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS waystones (" + // make sure to put your table name in here too.
-      "`player` varchar(32) NOT NULL," + // This creates the different colums you will save data too. varchar(32) Is a string, int = integer
-      "`name` int(11) NOT NULL," +
+      "`name` varchar(32) NOT NULL," +
+      "`player` varchar(32) NOT NULL," +
+      "`world` varchar(32) NOT NULL," +
       "`loc_x` int(11) NOT NULL," +
       "`loc_y` int(11) NOT NULL," +
       "`loc_z` int(11) NOT NULL," +

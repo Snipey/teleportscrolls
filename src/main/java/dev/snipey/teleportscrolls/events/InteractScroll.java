@@ -1,5 +1,6 @@
 package dev.snipey.teleportscrolls.events;
 
+import com.google.common.collect.Lists;
 import dev.snipey.teleportscrolls.TeleportScrolls;
 import dev.snipey.teleportscrolls.managers.ScrollManager;
 import dev.snipey.teleportscrolls.managers.Structure;
@@ -37,7 +38,6 @@ public class InteractScroll implements Listener {
   public Map<UUID, BukkitTask> tasks = new HashMap<>();
   private static final TeleportScrolls plugin = JavaPlugin.getPlugin(TeleportScrolls.class);
   private final FireworkEffect fx = FireworkEffect.builder().withColor(Color.WHITE).with(FireworkEffect.Type.BALL).build();
-
   @EventHandler
   public void onScrollRightClick(PlayerInteractEvent e) {
     Block block = e.getClickedBlock();
@@ -50,9 +50,29 @@ public class InteractScroll implements Listener {
     if (block != null) {
       isQuarryStructure = Structure.WAYSTONE.test(block);
     }
-    if (a == Action.RIGHT_CLICK_BLOCK && hand.getType() == Material.PAPER && isQuarryStructure) {
+
+    if (a == Action.RIGHT_CLICK_BLOCK && hand.getItemMeta().getDisplayName().contains("Waystone Tool") && isQuarryStructure && p.isSneaking()) {
       // TODO Check if waystone exists
       // TODO Check if clicked with wand
+      if (slot.name().equals("OFF_HAND")) return;
+
+      plugin.getSignMenuFactory().newMenu(Lists.newArrayList("", "&4^^^^^^^^", "&4Waystone", "&3Name"))
+          .reopenIfFail()
+          .response((player, lines) -> {
+            if(lines != null) {
+              if(!lines[0].equals("") && !plugin.getDatabase().getWaystoneExist(block.getLocation())){
+                plugin.getDatabase().setWaystone(p, block.getLocation(), lines[0]);
+              } else {
+                p.sendMessage("That name already exists");
+              }
+              return true;
+            }
+            return false;
+          })
+          .open(p);
+
+    }
+    if (a == Action.RIGHT_CLICK_BLOCK && hand.getType() == Material.PAPER && isQuarryStructure) {
       if (slot.name().equals("OFF_HAND")) return;
       switch (block.getType()) {
         case EMERALD_BLOCK:
@@ -114,6 +134,7 @@ public class InteractScroll implements Listener {
     ItemStack clicked = e.getCurrentItem();
     Player player = (Player) ent;
     Location location = player.getLocation();
+
     Merchant merch = ScrollManager.createScrollForge(location);
     if (view.getTitle().equals("Waystone Menu") && clicked != null && e.getRawSlot() <= 8) {
       e.setCancelled(true);
