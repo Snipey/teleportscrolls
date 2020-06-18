@@ -7,5 +7,5 @@ api-version: 1.15
 
 commands:
   scroll:
-    description: Give yourself a scroll
-    usage: /scroll
+    description: Main interaction with the scroll cmd
+    usage: /scroll <task>
