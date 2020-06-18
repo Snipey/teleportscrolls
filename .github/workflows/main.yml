@@ -2,7 +2,10 @@ name: Build Plugin
 
 on:
   push:
-    branches: [ master ]
+    branches: 
+      - master
+      - develop
+      - feature/*
   pull_request:
     branches: [ master ]
 
@@ -22,4 +25,4 @@ jobs:
     - uses: actions/upload-artifact@v1
       with:
         name: TeleportScrolls
-        path: target/
+        path: target/**/*.jar
