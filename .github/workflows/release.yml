@@ -26,7 +26,7 @@ jobs:
     - name: Move Jars to Staging
       run: mkdir staging && cp target/*.jar staging
     - name: Zip folder
-      run: zip -r TeleportScrolls.zip staging
+      run: zip -r TeleportScrolls.zip staging/*
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
