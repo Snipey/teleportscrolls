@@ -27,9 +27,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 
 public class InteractScroll implements Listener {
@@ -38,6 +36,7 @@ public class InteractScroll implements Listener {
   public Map<UUID, BukkitTask> tasks = new HashMap<>();
   private static final TeleportScrolls plugin = JavaPlugin.getPlugin(TeleportScrolls.class);
   private final FireworkEffect fx = FireworkEffect.builder().withColor(Color.WHITE).with(FireworkEffect.Type.BALL).build();
+
   @EventHandler
   public void onScrollRightClick(PlayerInteractEvent e) {
     Block block = e.getClickedBlock();
@@ -52,25 +51,25 @@ public class InteractScroll implements Listener {
     }
 
     if (a == Action.RIGHT_CLICK_BLOCK && hand.getItemMeta().getDisplayName().contains("Waystone Tool") && isQuarryStructure && p.isSneaking()) {
-      // TODO Check if waystone exists
-      // TODO Check if clicked with wand
       if (slot.name().equals("OFF_HAND")) return;
-
-      plugin.getSignMenuFactory().newMenu(Lists.newArrayList("", "&4^^^^^^^^", "&4Waystone", "&3Name"))
-          .reopenIfFail()
-          .response((player, lines) -> {
-            if(lines != null) {
-              if(!lines[0].equals("") && !plugin.getDatabase().getWaystoneExist(block.getLocation())){
-                plugin.getDatabase().setWaystone(p, block.getLocation(), lines[0]);
-              } else {
-                p.sendMessage("That name already exists");
+      if (!plugin.getDatabase().getWaystoneExist(block.getLocation())) {
+        plugin.getSignMenuFactory().newMenu(Lists.newArrayList("", "&4^^^^^^^^", "&3Waystone", "&3Name"))
+            .reopenIfFail()
+            .response((player, lines) -> {
+              if (lines != null) {
+                if (!lines[0].equals("")) {
+                  plugin.getDatabase().setWaystone(p, block.getLocation(), lines[0]);
+                } else {
+                  p.sendMessage(ChatColor.RED + "You need to type a unique name");
+                }
+                return true;
               }
-              return true;
-            }
-            return false;
-          })
-          .open(p);
-
+              return false;
+            })
+            .open(p);
+      } else {
+        p.sendMessage("Waystone Exists already");
+      }
     }
     if (a == Action.RIGHT_CLICK_BLOCK && hand.getType() == Material.PAPER && isQuarryStructure) {
       if (slot.name().equals("OFF_HAND")) return;
@@ -151,13 +150,29 @@ public class InteractScroll implements Listener {
       }
     }
   }
+
   @EventHandler
   public static void onStructureBreak(BlockBreakEvent e) {
     Block block = e.getBlock();
+    Player p = e.getPlayer();
     boolean isStructure = Structure.WAYSTONE.test(block);
-    if(isStructure){
-      // TODO Check if structure exists in db
+    if (isStructure && checkWaystoneExists(block, 3)) {
       e.setCancelled(true);
     }
+  }
+
+  public static boolean checkWaystoneExists(Block start, int radius){
+    ArrayList<Block> blocks = new ArrayList<>();
+    for(double x = start.getLocation().getX() - radius; x <= start.getLocation().getX() + radius; x++){
+      for(double y = start.getLocation().getY() - radius; y <= start.getLocation().getY() + radius; y++){
+        for(double z = start.getLocation().getZ() - radius; z <= start.getLocation().getZ() + radius; z++){
+          Location loc = new Location(start.getWorld(), x, y, z);
+          if(plugin.getDatabase().getWaystoneExist(loc)){
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 }
