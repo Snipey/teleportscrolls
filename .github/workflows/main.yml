@@ -30,8 +30,6 @@ jobs:
       run: mvn -B package --file pom.xml
     - name: Move Jars to Staging
       run: mkdir staging && cp target/*.jar staging
-    - name: Zip folder
-      run: zip -r TeleportScrolls.zip staging/*
     - uses: actions/upload-artifact@v1
       with:
         name: TeleportScrolls
