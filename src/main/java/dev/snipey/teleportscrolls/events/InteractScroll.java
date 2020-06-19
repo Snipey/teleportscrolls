@@ -142,11 +142,24 @@ public class InteractScroll implements Listener {
           player.openMerchant(merch, false);
           break;
         case RED_WOOL:
-          // trigger waystone deletion
+          player.openInventory(ScrollManager.scrollForgeMenuConfirmation(null));
           break;
         case PAPER:
           player.openMerchant(merch, false);
           break;
+      }
+    }
+    if (view.getTitle().equals("Delete Waystone?") && clicked != null && e.getRawSlot() <= 8) {
+      e.setCancelled(true);
+      if (checkWaystoneExists(location.getBlock(), 3)){
+        switch (clicked.getType()){
+          case RED_WOOL:
+
+            break;
+          case GREEN_WOOL:
+
+            break;
+        }
       }
     }
   }
@@ -162,7 +175,6 @@ public class InteractScroll implements Listener {
   }
 
   public static boolean checkWaystoneExists(Block start, int radius){
-    ArrayList<Block> blocks = new ArrayList<>();
     for(double x = start.getLocation().getX() - radius; x <= start.getLocation().getX() + radius; x++){
       for(double y = start.getLocation().getY() - radius; y <= start.getLocation().getY() + radius; y++){
         for(double z = start.getLocation().getZ() - radius; z <= start.getLocation().getZ() + radius; z++){

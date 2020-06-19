@@ -23,14 +23,34 @@ public class ScrollManager {
     ItemMeta meta = craft.getItemMeta();
     meta.setDisplayName(ChatColor.GREEN + "Craft Blueprint");
 
-    ItemStack wool = new ItemStack(Material.ANVIL);
+    ItemStack wool = new ItemStack(Material.RED_WOOL);
     ItemMeta woolmeta = wool.getItemMeta();
-    woolmeta.setDisplayName(ChatColor.GREEN + "Craft Blueprint");
+    woolmeta.setDisplayName(ChatColor.RED + "Delete Waystone");
+    wool.setItemMeta(woolmeta);
+
 
     craft.setItemMeta(meta);
     inv.setItem(0, craft); // Craft Blueprint
-    inv.setItem(4, new ItemStack(Material.RED_WOOL)); // Delete Waystone
+    inv.setItem(4, new ItemStack(wool)); // Delete Waystone
     inv.setItem(8, new ItemStack(Material.PAPER)); // Waystone Info
+    return inv;
+  }
+
+  public static Inventory scrollForgeMenuConfirmation(Location loc) {
+    Inventory inv = Bukkit.createInventory(null, 9, "Delete Waystone?");
+
+    ItemStack confirm = new ItemStack(Material.GREEN_WOOL);
+    ItemMeta cmeta = confirm.getItemMeta();
+    cmeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.UNDERLINE + "Confirm");
+    confirm.setItemMeta(cmeta);
+
+    ItemStack deny = new ItemStack(Material.RED_WOOL);
+    ItemMeta dmeta = confirm.getItemMeta();
+    dmeta.setDisplayName(ChatColor.RED + "" + ChatColor.UNDERLINE + "Cancel");
+    deny.setItemMeta(dmeta);
+
+    inv.setItem(2, new ItemStack(confirm)); // Confirm
+    inv.setItem(6, new ItemStack(deny));   // Cancel
     return inv;
   }
 
