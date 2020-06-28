@@ -1,10 +1,8 @@
 package dev.snipey.teleportscrolls.database;
 
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.logging.Level;
 
 import dev.snipey.teleportscrolls.TeleportScrolls;
@@ -38,16 +36,53 @@ public abstract class Database {
       plugin.getLogger().log(Level.SEVERE, "Unable to retreive connection", ex);
     }
   }
-  // TODO Check if waystone exists in db
+
   /*
    * Data:
    * Waystone Name - String
-   * PLayer - UUID
+   * Player - UUID
    *
    */
 
-  // These are the methods you can use to get things out of your database. You of course can make new ones to return different things in the database.
-  // This returns the number of people the player killed.
+  public ArrayList<String> getWaystoneInfo(Location loc) {
+    Connection conn = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+
+    int x = (int) loc.getX();
+    int y = (int) loc.getY();
+    int z = (int) loc.getZ();
+
+    try {
+      conn = getSQLConnection();
+      ps = conn.prepareStatement("SELECT * FROM " + table + " WHERE loc_x = '"+x+"' AND loc_y = '"+y+"' AND loc_z = '"+z+"';");
+
+      rs = ps.executeQuery();
+      ResultSetMetaData metadata = rs.getMetaData();
+      int numberOfColumns = metadata.getColumnCount();
+      ArrayList<String> arrayList = new ArrayList<>();
+      while (rs.next()) {
+        int i = 1;
+        while(i <= numberOfColumns) {
+          arrayList.add(rs.getString(i++));
+        }
+      }
+      return arrayList;
+    } catch (SQLException ex) {
+      plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
+    } finally {
+      try {
+        if (ps != null)
+          ps.close();
+        if (conn != null)
+          conn.close();
+      } catch (SQLException ex) {
+        plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
+      }
+    }
+    return null;
+  }
+
   public boolean getWaystoneExist(Location loc) {
     Connection conn = null;
     PreparedStatement ps = null;

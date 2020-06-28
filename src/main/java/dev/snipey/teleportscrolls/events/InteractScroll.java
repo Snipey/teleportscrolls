@@ -14,7 +14,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -44,7 +43,6 @@ public class InteractScroll implements Listener {
     Action a = e.getAction();
     EquipmentSlot slot = e.getHand();
     ItemStack hand = e.getPlayer().getInventory().getItemInMainHand();
-    Inventory inv = ScrollManager.createScrollForgeMenu();
     boolean isQuarryStructure = false;
     if (block != null) {
       isQuarryStructure = Structure.WAYSTONE.test(block);
@@ -73,9 +71,11 @@ public class InteractScroll implements Listener {
     }
     if (a == Action.RIGHT_CLICK_BLOCK && hand.getType() == Material.PAPER && isQuarryStructure) {
       if (slot.name().equals("OFF_HAND")) return;
-      switch (block.getType()) {
-        case EMERALD_BLOCK:
-          p.openInventory(inv);
+      if (plugin.getDatabase().getWaystoneExist(block.getLocation())) {
+        switch (block.getType()) {
+          case EMERALD_BLOCK:
+            ScrollManager.openForgeMenu(p, block.getLocation());
+        }
       }
     } else if (a == Action.RIGHT_CLICK_AIR && hand.getType() == Material.PAPER) {
       if (!slot.name().equals("OFF_HAND")) {
@@ -133,8 +133,17 @@ public class InteractScroll implements Listener {
     ItemStack clicked = e.getCurrentItem();
     Player player = (Player) ent;
     Location location = player.getLocation();
+    PersistentDataContainer data = clicked.getItemMeta().getPersistentDataContainer();
+    int x = 0, y = 0, z = 0;
+    if (data.has(plugin.xKey, PersistentDataType.INTEGER)) {
+      x = data.get(plugin.xKey, PersistentDataType.INTEGER);
+      y = data.get(plugin.yKey, PersistentDataType.INTEGER);
+      z = data.get(plugin.zKey, PersistentDataType.INTEGER);
 
-    Merchant merch = ScrollManager.createScrollForge(location);
+    }
+    Location loc = new Location(e.getWhoClicked().getWorld(), x, y, z);
+    ArrayList<String> info = plugin.getDatabase().getWaystoneInfo(loc);
+    Merchant merch = ScrollManager.createScrollForge(info.get(0), location);
     if (view.getTitle().equals("Waystone Menu") && clicked != null && e.getRawSlot() <= 8) {
       e.setCancelled(true);
       switch (clicked.getType()) {
@@ -145,19 +154,19 @@ public class InteractScroll implements Listener {
           player.openInventory(ScrollManager.scrollForgeMenuConfirmation(null));
           break;
         case PAPER:
-          player.openMerchant(merch, false);
           break;
       }
     }
     if (view.getTitle().equals("Delete Waystone?") && clicked != null && e.getRawSlot() <= 8) {
       e.setCancelled(true);
-      if (checkWaystoneExists(location.getBlock(), 3)){
+      if (ScrollManager.checkWaystoneExists(location.getBlock(), 3)){
         switch (clicked.getType()){
           case RED_WOOL:
-
+            view.close();
             break;
           case GREEN_WOOL:
-
+            player.sendMessage(ChatColor.GREEN + "Waystone Deleted!");
+            view.close();
             break;
         }
       }
@@ -169,22 +178,10 @@ public class InteractScroll implements Listener {
     Block block = e.getBlock();
     Player p = e.getPlayer();
     boolean isStructure = Structure.WAYSTONE.test(block);
-    if (isStructure && checkWaystoneExists(block, 3)) {
+    if (isStructure && ScrollManager.checkWaystoneExists(block, 3)) {
       e.setCancelled(true);
     }
   }
 
-  public static boolean checkWaystoneExists(Block start, int radius){
-    for(double x = start.getLocation().getX() - radius; x <= start.getLocation().getX() + radius; x++){
-      for(double y = start.getLocation().getY() - radius; y <= start.getLocation().getY() + radius; y++){
-        for(double z = start.getLocation().getZ() - radius; z <= start.getLocation().getZ() + radius; z++){
-          Location loc = new Location(start.getWorld(), x, y, z);
-          if(plugin.getDatabase().getWaystoneExist(loc)){
-            return true;
-          }
-        }
-      }
-    }
-    return false;
-  }
+
 }
